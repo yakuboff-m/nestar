@@ -13,6 +13,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new LoggingInterceptor);
   // app.useGlobalFilters(new GqlGlobalExceptionFilter());
+  
   app.enableCors({origin: true, credentials: true});
 
   app.use(graphqlUploadExpress({maxFileSize: 15000000, max: 10}));
