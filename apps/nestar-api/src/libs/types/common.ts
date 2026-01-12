@@ -4,8 +4,8 @@ export interface T {
     [key: string]: any;
 }
 
-export interface StatisticsModier {
+export interface StatisticModifier {
     _id: ObjectId;
-    targetkey: string;
+    targetKey: string;
     modifier: number;
 }
