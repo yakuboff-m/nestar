@@ -1,7 +1,7 @@
 import { MemberType } from './../../libs/enums/member.enum';
 import { Mutation, Resolver, Query, Args } from '@nestjs/graphql';
 import { MemberService } from './member.service';
-import { InternalServerErrorException, UseGuards } from '@nestjs/common';
+import { BadGatewayException, BadRequestException, InternalServerErrorException, UseGuards } from '@nestjs/common';
 import { AgentsInquiry, LoginInput, MemberInput, MembersInquiry } from '../../libs/dto/member/member.input';
 import { Member, Members } from '../../libs/dto/member/member';
 import { AuthGuard } from '../auth/guards/auth.guard';
@@ -106,9 +106,9 @@ export class MemberResolver {
 	): Promise<string> {
 		console.log('Mutation: imageUploader');
 
-		if (!filename) throw new Error(Message.UPLOAD_FAILED);
+		if (!filename) throw new BadRequestException(Message.UPLOAD_FAILED);
 		const validMime = validMimeTypes.includes(mimetype);
-		if (!validMime) throw new Error(Message.PROVIDE_ALLOWED_FORMAT);
+		if (!validMime) throw new BadRequestException(Message.PROVIDE_ALLOWED_FORMAT);
 
 		const imageName = getSerialForImage(filename);
 		const url = `uploads/${target}/${imageName}`;
@@ -140,7 +140,7 @@ export class MemberResolver {
 				const { filename, mimetype, encoding, createReadStream } = await img;
 
 				const validMime = validMimeTypes.includes(mimetype);
-				if (!validMime) throw new Error(Message.PROVIDE_ALLOWED_FORMAT);
+				if (!validMime) throw new InternalServerErrorException(Message.PROVIDE_ALLOWED_FORMAT);
 
 				const imageName = getSerialForImage(filename);
 				const url = `uploads/${target}/${imageName}`;
@@ -152,7 +152,7 @@ export class MemberResolver {
 						.on('finish', () => resolve(true))
 						.on('error', () => reject(false));
 				});
-				if (!result) throw new Error(Message.UPLOAD_FAILED);
+				if (!result) throw new InternalServerErrorException(Message.UPLOAD_FAILED);
 
 				uploadedImages[index] = url;
 			} catch (err) {
