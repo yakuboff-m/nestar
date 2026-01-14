@@ -17,7 +17,6 @@ import { ViewGroup } from '../../libs/enums/view.enum';
 import { PropertyUpdate } from '../../libs/dto/property/property.update';
 import * as moment from 'moment';
 import { lookUpmember, shapeIntoMongoObjectId, unwindMember } from '../../libs/config';
-import { SHARE_ENV } from 'worker_threads';
 
 @Injectable()
 export class PropertyService {
