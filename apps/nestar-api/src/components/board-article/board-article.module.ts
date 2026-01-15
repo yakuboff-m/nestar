@@ -16,10 +16,10 @@ import { ViewModule } from '../view/view.module';
 			},
 		]),
 		AuthModule,
-    MemberModule,
-    ViewModule,
+		MemberModule,
+		ViewModule,
 	],
 	providers: [BoardArticleResolver, BoardArticleService],
-  exports: [BoardArticleService]
+	exports: [BoardArticleService],
 })
 export class BoardArticleModule {}
