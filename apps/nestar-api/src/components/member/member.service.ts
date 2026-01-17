@@ -29,7 +29,6 @@ export class MemberService {
 
 		try {
 			const result = await this.memberModel.create(input);
-			// TODO: Authentication via token
 			result.accessToken = await this.authService.createToken(result);
 			return result;
 		} catch (err) {
@@ -89,7 +88,9 @@ export class MemberService {
 				targetMember.memberViews++;
 			}
 
-			// todo: meLiked
+			// meLiked
+			const likeInput: LikeInput = {memberId, likeRefId: targetId, likeGroup: LikeGroup.MEMBER};
+			targetMember.meLiked = await this.likeService.checkLikeExistence(likeInput);
 			// todo: meFollowed
 		}
 
