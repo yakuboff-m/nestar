@@ -16,8 +16,7 @@ export class FollowService {
     constructor(
         @InjectModel('Follow') private readonly followModel: Model<Follower | Following>,
         private authService: AuthService,
-        private memberService: MemberService,
-        private viewService: ViewService,
+        private memberService: MemberService
     ) { }
 
     public async subscribe(followerId: ObjectId, followingId: ObjectId): Promise<Follower> {

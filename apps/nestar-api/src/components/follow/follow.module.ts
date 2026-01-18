@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import FollowSchema from '../../schemas/Follow.model';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from '../auth/auth.module';
@@ -12,8 +12,7 @@ import { MemberModule } from '../member/member.module';
     imports: [
         MongooseModule.forFeature([{name: "Follow", schema: FollowSchema}]),
         AuthModule,
-        MemberModule,
-        ViewModule,
+        MemberModule
     ],
     providers: [FollowService, FollowResolver],
     exports: [FollowService]
