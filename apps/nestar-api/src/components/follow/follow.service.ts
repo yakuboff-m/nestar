@@ -1,13 +1,13 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, ObjectId } from 'mongoose';
+import { Model, ObjectId, Schema } from 'mongoose';
 import { Follower, Followers, Following, Followings } from '../../libs/dto/follow/follow';
 import { AuthService } from '../auth/auth.service';
 import { ViewService } from '../view/view.service';
 import { LikeService } from '../like/like.service';
 import { MemberService } from '../member/member.service';
 import { Direction, Message } from '../../libs/enums/common.enum';
-import { lookupFollowerData, lookupFollowingData } from '../../libs/config';
+import { lookupFollowerData, lookupFollowingData, lookupAuthMemberLiked } from '../../libs/config';
 import { FollowInquiry } from '../../libs/dto/follow/follow.input';
 import { T } from '../../libs/types/common';
 
@@ -82,6 +82,7 @@ export class FollowService {
                             { $skip: (page - 1) * limit },
                             { $limit: limit },
                             // meLiked
+                            lookupAuthMemberLiked(memberId, "$followingId"),
                             // meFollowed
                             lookupFollowingData,
                             { $unwind: '$followingData' },
@@ -118,6 +119,7 @@ export class FollowService {
                   { $skip: (page - 1) * limit },
                   { $limit: limit },
                   // meLiked
+                  lookupAuthMemberLiked(memberId, "$followerId"),
                   // meFollowed
                   lookupFollowerData,
                   { $unwind: '$followerData' },
@@ -135,3 +137,4 @@ export class FollowService {
         return result[0];
       }
 }
+
