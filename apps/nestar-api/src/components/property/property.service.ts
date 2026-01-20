@@ -199,6 +199,10 @@ export class PropertyService {
 		return await this.likeService.getFavoriteProperties(memberId, input);
 	}
 
+	public async getVisited(memberId: ObjectId, input: OrdinaryInquiry): Promise<Properties> {
+		return await this.viewService.getVisitedProperties(memberId, input);
+	}
+
 	public async likeTargetProperty(memberId: ObjectId, likeRefId: ObjectId): Promise<Property>{
 		const target = this.propertyModel.findOne({_id: likeRefId, propertyStatus: PropertyStatus.ACTIVE}).exec();
 		if(!target) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
