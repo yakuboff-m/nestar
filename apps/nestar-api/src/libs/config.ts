@@ -31,6 +31,8 @@ export const shapeIntoMongoObjectId = (target: any) => {
   return typeof target === "string" ? new ObjectId(target) : target;
 };
 
+//! -------- Deep dive into COMPLEX QUERY start------------
+//! define():
 export const lookupAuthMemberLiked = (memberId: T, targetRefId: string = "$_id") => {
   return {
     $lookup: {
@@ -43,10 +45,15 @@ export const lookupAuthMemberLiked = (memberId: T, targetRefId: string = "$_id")
       },
       pipeline: [
         {
+          //!( $match only => left side: document field; right side: variable )
           $match: {
+            //! (why $expr => Mongo requires $expr to compare field vs field)
             $expr: {
+              //! (why $and => enforcing two conditions simultaneously)
               $and: [
                 { $eq: ["$likeRefId", "$$localLikeRefId"] },
+                //! "$field" => single sign for doc.field
+                //! "$$var"  => double sign for variable
                 { $eq: ["$memberId", "$$localMemberId"] },
               ],
             },
@@ -65,6 +72,11 @@ export const lookupAuthMemberLiked = (memberId: T, targetRefId: string = "$_id")
     }
   }
 };
+
+//! call()
+//lookupAuthMemberLiked(memberId, "$followingId"),
+
+//! -------- Deep dive into COMPLEX QUERY end------------
 
 interface LookupAuthMemberFollowed{
   followerId: T;
@@ -138,5 +150,14 @@ export const lookupFollowerData = {
     localField: 'followerId',
     foreignField: '_id',
     as: 'followerData',
+  },
+};
+
+export const lookupFavorite = {
+  $lookup: {
+    from: 'members',
+    localField: 'favoriteProperty.memberId',
+    foreignField: '_id',
+    as: 'favoriteProperty.memberData',
   },
 };

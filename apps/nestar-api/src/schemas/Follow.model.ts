@@ -15,6 +15,6 @@ const FollowSchema = new Schema(
 	{ timestamps: true, collection: "follows" },
 );
 
-FollowSchema.index({ followingId: 1, followerId: 1 }, { unique: true }); // compound uni	ueness
+FollowSchema.index({ followingId: 1, followerId: 1 }, { unique: true }); // compound uni	qeness
 
 export default FollowSchema;
