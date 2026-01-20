@@ -7,7 +7,7 @@ import { ViewService } from '../view/view.service';
 import { LikeService } from '../like/like.service';
 import { MemberService } from '../member/member.service';
 import { Direction, Message } from '../../libs/enums/common.enum';
-import { lookupFollowerData, lookupFollowingData, lookupAuthMemberLiked } from '../../libs/config';
+import { lookupFollowerData, lookupFollowingData, lookupAuthMemberLiked, lookupAuthMemberFollowed } from '../../libs/config';
 import { FollowInquiry } from '../../libs/dto/follow/follow.input';
 import { T } from '../../libs/types/common';
 
@@ -84,6 +84,10 @@ export class FollowService {
                             // meLiked
                             lookupAuthMemberLiked(memberId, "$followingId"),
                             // meFollowed
+                            lookupAuthMemberFollowed({ 
+                                followerId: memberId, 
+                                followingId: "$followingId" 
+                            }),
                             lookupFollowingData,
                             { $unwind: '$followingData' },
                         ],
@@ -102,39 +106,43 @@ export class FollowService {
 
     public async getMemberFollowers(memberId: ObjectId, input: FollowInquiry): Promise<Followers> {
         const { page, limit, search } = input;
-      
+
         if (!search?.followingId) throw new InternalServerErrorException(Message.BAD_REQUEST);
-      
+
         const match: T = { followingId: search?.followingId };
-      
+
         console.log('match:', match);
-      
+
         const result = await this.followModel
-          .aggregate([
-            { $match: match },
-            { $sort: { createdAt: Direction.DESC } },
-            {
-              $facet: {
-                list: [
-                  { $skip: (page - 1) * limit },
-                  { $limit: limit },
-                  // meLiked
-                  lookupAuthMemberLiked(memberId, "$followerId"),
-                  // meFollowed
-                  lookupFollowerData,
-                  { $unwind: '$followerData' },
-                ],
-                metaCounter: [
-                  { $count: 'total' },
-                ],
-              },
-            },
-          ])
-          .exec();
-      
+            .aggregate([
+                { $match: match },
+                { $sort: { createdAt: Direction.DESC } },
+                {
+                    $facet: {
+                        list: [
+                            { $skip: (page - 1) * limit },
+                            { $limit: limit },
+                            // meLiked
+                            lookupAuthMemberLiked(memberId, "$followerId"),
+                            // meFollowed
+                            lookupAuthMemberFollowed({ 
+                                followerId: memberId, 
+                                followingId: "$followerId" 
+                            }),
+                            lookupFollowerData,
+                            { $unwind: '$followerData' },
+                        ],
+                        metaCounter: [
+                            { $count: 'total' },
+                        ],
+                    },
+                },
+            ])
+            .exec();
+
         if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
-      
+
         return result[0];
-      }
+    }
 }
 
