@@ -52,29 +52,32 @@ export class PropertyService {
 			_id: propertyId,
 			propertyStatus: PropertyStatus.ACTIVE,
 		};
-
+	
 		const targetProperty: Property = await this.propertyModel.findOne(search).lean().exec();
-
+	
 		if (!targetProperty) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
-
-		const viewInput = { memberId: memberId, viewRefId: propertyId, viewGroup: ViewGroup.PROPERTY };
-		const newView = await this.viewService.recordView(viewInput);
-
-		if (newView) {
-			await this.propertyStatsEditor({
-				_id: propertyId,
-				targetKey: 'propertyViews',
-				modifier: 1,
-			});
-			targetProperty.propertyViews++;
-		}
-
-		// meliked
-		const likeInput: LikeInput = {memberId, likeRefId: propertyId, likeGroup: LikeGroup.PROPERTY};
+	
+		// Only record view if user is logged in
+		if (memberId) {
+			const viewInput = { memberId: memberId, viewRefId: propertyId, viewGroup: ViewGroup.PROPERTY };
+			const newView = await this.viewService.recordView(viewInput);
+	
+			if (newView) {
+				await this.propertyStatsEditor({
+					_id: propertyId,
+					targetKey: 'propertyViews',
+					modifier: 1,
+				});
+				targetProperty.propertyViews++;
+			}
+	
+			// meLiked - only check if logged in
+			const likeInput: LikeInput = { memberId, likeRefId: propertyId, likeGroup: LikeGroup.PROPERTY };
 			targetProperty.meLiked = await this.likeService.checkLikeExistence(likeInput);
-
+		}
+	
 		targetProperty.memberData = await this.memberService.getMember(null, targetProperty.memberId);
-
+	
 		return targetProperty;
 	}
 
